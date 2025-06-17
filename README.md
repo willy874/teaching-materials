@@ -1,6 +1,6 @@
-# Login System Backend
+# Teaching Materials
 
-一個基於 Node.js 和 Express 的登入系統後端實作，提供完整的用戶註冊、登入、密碼管理功能。
+一個基於 Node.js 和 Express 的後端實作，主要是用來教學，大部分都是使用 Vibe Coding 製作。
 
 ## 功能特色
 
