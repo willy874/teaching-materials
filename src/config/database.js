@@ -57,6 +57,30 @@ const createTables = () => {
         FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
+
+    // 待辦事項表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS todos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title VARCHAR(100) NOT NULL,
+        description TEXT,
+        completed BOOLEAN DEFAULT 0,
+        priority VARCHAR(10) DEFAULT 'medium',
+        category VARCHAR(20),
+        due_date DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        user_id INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // 為 todos 表建立索引以提升查詢效能
+    db.run(`CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_todos_completed ON todos(completed)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_todos_priority ON todos(priority)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_todos_category ON todos(category)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_todos_due_date ON todos(due_date)`);
   });
 };
 
