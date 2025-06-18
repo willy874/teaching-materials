@@ -89,27 +89,13 @@
 - SQL注入防護
 - XSS攻擊防護
 - CSRF Token驗證
-- Rate Limiting（每分鐘最多10次登入嘗試）
-
-### 3.2 效能
-
-- 登入響應時間 < 2秒
-- 註冊響應時間 < 3秒
-- 支援併發用戶數：1000+
-- 資料庫連線池管理
-
-### 3.3 可用性
-
-- 系統可用性 ≥ 99.5%
-- 友善的錯誤訊息提示
-- 響應式設計支援行動裝置
-- 多語言支援（中文、英文）
 
 ## 4. 技術規格
 
 ### 4.1 前端技術
 
-- Framework: React.js
+- Framework: Next.js
+- Auth: NextAuth
 
 ### 4.2 後端技術
 
@@ -158,7 +144,7 @@ CREATE TABLE password_resets (
 
 ### 5.1 認證相關API
 
-```
+```http
 POST /api/auth/register
 POST /api/auth/login
 POST /api/auth/logout
@@ -169,7 +155,7 @@ POST /api/auth/reset-password
 
 ### 5.2 用戶管理API
 
-```
+```http
 GET  /api/user/profile
 PUT  /api/user/profile
 POST /api/user/change-password
