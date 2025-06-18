@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const todoRoutes = require('./routes/todos');
 const { initDatabase } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 // 路由
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/todos', todoRoutes);
 
 // 錯誤處理中間件
 app.use(errorHandler);

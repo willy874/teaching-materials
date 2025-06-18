@@ -87,8 +87,180 @@ const changePasswordSchema = Joi.object({
     })
 });
 
+const todoSchema = Joi.object({
+  title: Joi.string()
+    .trim()
+    .min(1)
+    .max(100)
+    .required()
+    .messages({
+      'string.empty': '標題不能為空',
+      'string.min': '標題至少需要1個字元',
+      'string.max': '標題不能超過100個字元',
+      'any.required': '標題為必填欄位'
+    }),
+  
+  description: Joi.string()
+    .trim()
+    .max(500)
+    .optional()
+    .allow('')
+    .messages({
+      'string.max': '描述不能超過500個字元'
+    }),
+  
+  priority: Joi.string()
+    .valid('low', 'medium', 'high')
+    .optional()
+    .messages({
+      'any.only': '優先級必須是 low、medium 或 high'
+    }),
+  
+  category: Joi.string()
+    .trim()
+    .min(1)
+    .max(20)
+    .optional()
+    .allow('')
+    .messages({
+      'string.min': '分類至少需要1個字元',
+      'string.max': '分類不能超過20個字元'
+    }),
+  
+  dueDate: Joi.date()
+    .iso()
+    .optional()
+    .messages({
+      'date.format': '截止日期格式必須是 ISO 8601 格式'
+    })
+});
+
+const todoUpdateSchema = Joi.object({
+  title: Joi.string()
+    .trim()
+    .min(1)
+    .max(100)
+    .optional()
+    .messages({
+      'string.empty': '標題不能為空',
+      'string.min': '標題至少需要1個字元',
+      'string.max': '標題不能超過100個字元'
+    }),
+  
+  description: Joi.string()
+    .trim()
+    .max(500)
+    .optional()
+    .allow('')
+    .messages({
+      'string.max': '描述不能超過500個字元'
+    }),
+  
+  completed: Joi.boolean()
+    .optional()
+    .messages({
+      'boolean.base': '完成狀態必須是布林值'
+    }),
+  
+  priority: Joi.string()
+    .valid('low', 'medium', 'high')
+    .optional()
+    .messages({
+      'any.only': '優先級必須是 low、medium 或 high'
+    }),
+  
+  category: Joi.string()
+    .trim()
+    .min(1)
+    .max(20)
+    .optional()
+    .allow('')
+    .messages({
+      'string.min': '分類至少需要1個字元',
+      'string.max': '分類不能超過20個字元'
+    }),
+  
+  dueDate: Joi.date()
+    .iso()
+    .optional()
+    .allow(null)
+    .messages({
+      'date.format': '截止日期格式必須是 ISO 8601 格式'
+    })
+}).min(1).messages({
+  'object.min': '至少需要提供一個要更新的欄位'
+});
+
+const todoQuerySchema = Joi.object({
+  page: Joi.number()
+    .integer()
+    .min(1)
+    .optional()
+    .messages({
+      'number.base': '頁碼必須是數字',
+      'number.integer': '頁碼必須是整數',
+      'number.min': '頁碼必須大於0'
+    }),
+  
+  limit: Joi.number()
+    .integer()
+    .min(1)
+    .max(100)
+    .optional()
+    .messages({
+      'number.base': '每頁筆數必須是數字',
+      'number.integer': '每頁筆數必須是整數',
+      'number.min': '每頁筆數必須大於0',
+      'number.max': '每頁筆數不能超過100'
+    }),
+  
+  completed: Joi.boolean()
+    .optional()
+    .messages({
+      'boolean.base': '完成狀態篩選必須是布林值'
+    }),
+  
+  priority: Joi.string()
+    .valid('low', 'medium', 'high')
+    .optional()
+    .messages({
+      'any.only': '優先級篩選必須是 low、medium 或 high'
+    }),
+  
+  category: Joi.string()
+    .trim()
+    .optional()
+    .messages({
+      'string.base': '分類篩選必須是字串'
+    }),
+  
+  sortBy: Joi.string()
+    .valid('created_at', 'updated_at', 'due_date', 'priority', 'title')
+    .optional()
+    .messages({
+      'any.only': '排序欄位必須是 created_at、updated_at、due_date、priority 或 title'
+    }),
+  
+  sortOrder: Joi.string()
+    .valid('asc', 'desc')
+    .optional()
+    .messages({
+      'any.only': '排序方向必須是 asc 或 desc'
+    }),
+  
+  search: Joi.string()
+    .trim()
+    .optional()
+    .messages({
+      'string.base': '搜尋關鍵字必須是字串'
+    })
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
-  changePasswordSchema
+  changePasswordSchema,
+  todoSchema,
+  todoUpdateSchema,
+  todoQuerySchema
 };
