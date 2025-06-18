@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { getDatabase } = require('../config/database');
 const { registerSchema, loginSchema } = require('../utils/validation');
-const { generateToken, generateRefreshToken } = require('../utils/jwt');
+const { generateToken, generateRefreshToken, verifyToken } = require('../utils/jwt');
 
 const register = async (req, res, next) => {
   try {
@@ -206,8 +206,86 @@ const logout = async (req, res, next) => {
   }
 };
 
+const refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    
+    if (!refreshToken) {
+      return res.status(401).json({
+        error_code: 'REFRESH_TOKEN_REQUIRED',
+        message: 'Refresh token 必填',
+        data: {}
+      });
+    }
+
+    let decoded;
+    try {
+      decoded = verifyToken(refreshToken);
+    } catch (error) {
+      return res.status(401).json({
+        error_code: 'INVALID_REFRESH_TOKEN',
+        message: 'Refresh token 無效或已過期',
+        data: {}
+      });
+    }
+
+    const db = getDatabase();
+    
+    // 驗證用戶是否存在且狀態正常
+    const findUser = new Promise((resolve, reject) => {
+      db.get(
+        'SELECT * FROM users WHERE id = ?',
+        [decoded.userId],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    const user = await findUser;
+    if (!user) {
+      return res.status(401).json({
+        error_code: 'USER_NOT_FOUND',
+        message: '用戶不存在',
+        data: {}
+      });
+    }
+
+    if (!user.is_active) {
+      return res.status(403).json({
+        error_code: 'ACCOUNT_DISABLED',
+        message: '帳戶已被停用',
+        data: {}
+      });
+    }
+
+    // 生成新的 access token
+    const tokenPayload = {
+      userId: user.id,
+      username: user.username,
+      email: user.email
+    };
+
+    const newToken = generateToken(tokenPayload);
+    const newRefreshToken = generateRefreshToken(tokenPayload);
+
+    res.json({
+      message: 'Token 刷新成功',
+      data: {
+        accessToken: newToken,
+        refreshToken: newRefreshToken,
+      }
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
-  logout
+  logout,
+  refreshToken
 };

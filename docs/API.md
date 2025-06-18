@@ -179,7 +179,50 @@ Authorization: Bearer <jwt_token>
 
 ---
 
-### 4. 忘記密碼
+### 4. 刷新令牌
+
+**POST** `/api/auth/refresh-token`
+
+使用 refresh token 獲取新的 access token。
+
+#### 請求參數
+
+| 參數 | 類型 | 必填 | 說明 |
+|------|------|------|------|
+| refreshToken | string | ✓ | 登入時獲得的 refresh token |
+
+#### 請求範例
+
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### 成功響應 (200)
+
+```json
+{
+  "message": "Token 刷新成功",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+#### 錯誤響應
+
+| 狀態碼 | 錯誤代碼 | 說明 |
+|--------|----------|------|
+| 401 | REFRESH_TOKEN_REQUIRED | 未提供 refresh token |
+| 401 | INVALID_REFRESH_TOKEN | refresh token 無效或已過期 |
+| 401 | USER_NOT_FOUND | 用戶不存在 |
+| 403 | ACCOUNT_DISABLED | 帳戶已被停用 |
+
+---
+
+### 5. 忘記密碼
 
 **POST** `/api/auth/forgot-password`
 
@@ -218,7 +261,7 @@ Authorization: Bearer <jwt_token>
 
 ---
 
-### 5. 重設密碼
+### 6. 重設密碼
 
 **POST** `/api/auth/reset-password`
 
@@ -262,7 +305,7 @@ Authorization: Bearer <jwt_token>
 
 ---
 
-### 6. 修改密碼
+### 7. 修改密碼
 
 **POST** `/api/auth/change-password`
 
@@ -427,6 +470,8 @@ Authorization: Bearer <jwt_token>
 | VALIDATION_ERROR | 400 | 輸入資料驗證失敗 |
 | UNAUTHORIZED | 401 | 未提供有效的認證令牌 |
 | INVALID_CREDENTIALS | 401 | 帳號或密碼錯誤 |
+| REFRESH_TOKEN_REQUIRED | 401 | 未提供 refresh token |
+| INVALID_REFRESH_TOKEN | 401 | refresh token 無效或已過期 |
 | ACCOUNT_DISABLED | 403 | 帳戶已被停用 |
 | EMAIL_EXISTS | 409 | 電子郵件已被使用 |
 | USERNAME_EXISTS | 409 | 用戶名稱已被使用 |
@@ -483,9 +528,10 @@ Authorization: Bearer <jwt_token>
 ## 安全功能
 
 ### JWT Token
-- 有效期：24小時
+- **Access Token**: 有效期 24小時，用於 API 請求認證
+- **Refresh Token**: 有效期 30天，用於獲取新的 access token
 - 包含用戶基本資訊（userId, username, email）
-- 需要在 Authorization Header 中以 Bearer Token 形式提供
+- Access token 需要在 Authorization Header 中以 Bearer Token 形式提供
 
 ### 密碼安全
 - 使用 bcrypt 加密，salt rounds = 12
